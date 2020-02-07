@@ -2,13 +2,14 @@
 
 
 class AbstractMelonOrder():
-    def __init__(self, species, qty, country_code="USA"):
+    def __init__(self, species, qty, country_code, order_type, tax):
 
         self.species = species
         self.qty = qty
         self.shipped = False
         self.country_code = country_code
-        self.passed_inspection = False
+        self.order_type = order_type
+        self.tax = tax
 
     def get_total(self):
         """Calculate price, including tax."""
@@ -24,30 +25,26 @@ class AbstractMelonOrder():
         if self.country_code != 'USA' and self.qty < 10:
             return total + 3
 
-        return total   
+        return total
 
     def mark_shipped(self):
         """Record the fact than an order has been shipped."""
 
-        self.shipped = True     
-
-    def mark_inspection(self):
-        """"""
-        self.passed_inspection = True
+        self.shipped = True
 
 
 class DomesticMelonOrder(AbstractMelonOrder):
     """A melon order within the USA."""
 
-    order_type = "domestic"
-    tax = 0.08
+    def __init__(self, species, qty):
+        super().__init__(species, qty, 'USA', 'domestic', 0.08)
 
 
 class InternationalMelonOrder(AbstractMelonOrder):
     """An international (non-US) melon order."""
 
-    order_type = "international"
-    tax = 0.17
+    def __init__(self, species, qty, country_code):
+        super().__init__(species, qty, country_code, 'international', 0.17)
 
     def get_country_code(self):
         """Return the country code."""
@@ -56,5 +53,13 @@ class InternationalMelonOrder(AbstractMelonOrder):
 
 
 class GovernmentMelonOrder(AbstractMelonOrder):
-    order_type = "Government"
-    tax = 0
+
+    def __init__(self, species, qty):
+        super().__init__(species, qty, 'USA', 'government', 0)
+
+    def mark_inspection(self, passed):
+        """"""
+        if passed:
+            self.passed_inspection = True
+        else:
+            self.passed_inspection = False
